@@ -1,0 +1,335 @@
+// chart height: 370, width: 440
+// chart margin: 6 all sides
+// x-axis height: 30, y-axis width: 60
+// overall height: 412, width: 512
+
+import React, { Component } from 'react';
+import {
+  LineChart,
+  AreaChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Line,
+  Area,
+} from 'recharts';
+import _ from 'lodash';
+import { formatData } from '../../Utils';
+import { TweenMax, TimelineMax } from "gsap";
+import ScrollMagic from 'scrollmagic';
+
+const initialGraph = formatData();
+const CHART_WIDTH = 730;
+const CHART_HEIGHT = 400;
+const MARGIN = 6;
+const Y_WIDTH = 60;
+const calculateBlocks = (blocks) => (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * blocks;
+
+const animationStart = {
+  left: calculateBlocks(3) + Y_WIDTH + MARGIN,
+  width: calculateBlocks(2),
+}
+const animation = {
+  left: -calculateBlocks(1),
+  width: calculateBlocks(4),
+}
+
+class SignificanceLevel extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      shrinkArea: false,
+      newGraph: {},
+    };
+  }
+
+  componentDidMount() {
+    const controller = new ScrollMagic.Controller();
+
+    const tl = new TimelineMax();
+
+    new ScrollMagic.Scene({
+      triggerElement: "#container",
+      duration: 1000,
+    })
+    .setTween(tl)
+    .addIndicators()
+    .addTo(controller);
+
+    tl.add(TweenMax.to(
+      "#animated-block", 1, 
+      { 
+        x: animation.left,
+        y: 0,
+        height: CHART_HEIGHT,
+        width: animation.width,
+      }
+    ));
+  }
+
+  toggleData = () => {
+    TweenMax.to(
+      "#animated-block", 1, 
+      { 
+        x: animation.left,
+        y: 0,
+        height: CHART_HEIGHT,
+        width: animation.width,
+      }
+    );
+  }
+
+  render() {
+    return (
+      <div style={{ overflowY: 'scroll' }}>
+      <div id="trigger" style={{ height: 100, marginTop: 100, backgroundColor:'black' }} />
+      <div id="container" style={{backgroundColor: '#fafafa', margin: 20, height: 1000, width: CHART_WIDTH, position: 'relative', paddingTop: 20 }}>
+        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+          <AreaChart
+            width={CHART_WIDTH}
+            height={CHART_HEIGHT}
+            data={initialGraph.data}
+            margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+          >
+            <XAxis
+              axisLine={false}
+              tickLine={false}
+              tick={false}
+              domain={[-4, 4]}
+            />
+            <YAxis
+              tick={false}
+              axisLine={false}
+              tickLine={false}
+              domain={[0, 0.5]}
+            />
+          <Area
+            type="monotone"
+            dataKey="y"
+            fill="#8884d8"
+            stroke="#8884d8"
+            isAnimationActive={false}
+          />
+        </AreaChart>
+        </div>
+        <div 
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: animationStart.left,
+            width: animationStart.width,
+            height: CHART_HEIGHT,
+            backgroundColor: '#fafafa'
+          }}
+          id="animated-block"
+        />
+        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+          <LineChart
+            width={CHART_WIDTH}
+            height={CHART_HEIGHT}
+            data={initialGraph.data}
+            onClick={this.toggleData}
+            margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+          >
+            <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#e1e1e1" />
+            <XAxis
+              dataKey="x"
+              domain={[-4, 4]}
+              tick={{ fontSize: 12 }}
+              tickCount={initialGraph.ticks}
+              interval={1}
+              stroke="#aaaaaa"
+            />
+            <YAxis
+              dataKey="y"
+              domain={[0, 0.5]}
+              tick={{ fontSize: 10 }}
+              tickCount={11}
+              interval={0}
+              type="number"
+              stroke="#aaaaaa"
+            />
+            <Line
+              type="monotone"
+              dataKey="y"
+              stroke="#ff9933"
+              dot={false}
+              strokeWidth={2}
+            />
+          </LineChart>
+        </div>
+      </div>
+      </div>
+    );
+  }
+}
+
+export default SignificanceLevel;
+
+
+// import React, { Component } from 'react';
+// import {
+//   LineChart,
+//   AreaChart,
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Line,
+//   Area,
+// } from 'recharts';
+// import _ from 'lodash';
+// import { formatData } from '../../Utils';
+// import { TweenMax } from "gsap";
+
+// const initialGraph = formatData();
+// const CHART_WIDTH = 730;
+// const CHART_HEIGHT = 400;
+// const MARGIN = 6;
+// const Y_WIDTH = 60;
+// const animationStart = {
+//   left: (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * 3 + Y_WIDTH + MARGIN,
+//   width: (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * 2,
+// }
+// const animationEnd = {
+//   left: (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * 2 + Y_WIDTH + MARGIN,
+//   width: (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * 4,
+// }
+
+// class SignificanceLevel extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = {
+//       shrinkArea: false,
+//       newGraph: {},
+//       animation: animationStart
+//     };
+//   }
+
+//   toggleData = () => {
+//     var start, end;
+//     const startTime = Date.now();
+//     const shrinkArea = !this.state.shrinkArea;
+
+//     if(shrinkArea) {
+//       start = animationStart;
+//       end = animationEnd;
+//     } else {
+//       start = animationEnd;
+//       end = animationStart;
+//     }
+
+//     const changeWidth = end.width - start.width;
+//     const changeLeft = end.left - start.left;
+
+//     const animate = () => {
+//       const timePassed = Date.now() - startTime;
+//       const width = Math.floor(timePassed / 800 * changeWidth + start.width);
+//       const left = Math.floor(timePassed / 800 * changeLeft + start.left);
+//       if ((shrinkArea && width > end.width) || (!shrinkArea && width < end.width)) {
+//         this.setState({ 
+//           animation: { 
+//             left: end.left,
+//             width: end.width,
+//           }
+//         });
+//       }
+
+//       if ((shrinkArea && width <= end.width) || (!shrinkArea && width >= end.width)) {
+//         this.setState({ 
+//           animation: { 
+//             left,
+//             width,
+//           }
+//         });
+//         requestAnimationFrame(animate);
+//       }
+//     }
+//     animate();
+
+//     this.setState({ shrinkArea });
+//   }
+
+//   render() {
+//     const { animation } = this.state;
+
+//     return (
+//       <div id="container" style={{backgroundColor: '#fafafa', margin: 20, height: CHART_HEIGHT, width: CHART_WIDTH, position: 'relative' }}>
+//         <div style={{ position: 'absolute', top: 0, left: 0 }}>
+//           <AreaChart
+//             width={CHART_WIDTH}
+//             height={CHART_HEIGHT}
+//             data={initialGraph.data}
+//             margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+//           >
+//             <XAxis
+//               axisLine={false}
+//               tickLine={false}
+//               tick={false}
+//               domain={[-4, 4]}
+//             />
+//             <YAxis
+//               tick={false}
+//               axisLine={false}
+//               tickLine={false}
+//               domain={[0, 0.5]}
+//             />
+//           <Area
+//             type="monotone"
+//             dataKey="y"
+//             fill="#8884d8"
+//             stroke="#8884d8"
+//             isAnimationActive={true}
+//           />
+//         </AreaChart>
+//         </div>
+//         <div 
+//           style={{
+//             position: 'absolute',
+//             top: 0,
+//             left: animation.left,
+//             width: animation.width,
+//             height: CHART_HEIGHT,
+//             backgroundColor: '#fafafa'
+//           }}
+//         />
+//         <div style={{ position: 'absolute', top: 0, left: 0 }}>
+//           <LineChart
+//             width={CHART_WIDTH}
+//             height={CHART_HEIGHT}
+//             data={initialGraph.data}
+//             onClick={this.toggleData}
+//             margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+//           >
+//             <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#e1e1e1" />
+//             <XAxis
+//               dataKey="x"
+//               domain={[-4, 4]}
+//               tick={{ fontSize: 12 }}
+//               tickCount={initialGraph.ticks}
+//               interval={1}
+//               stroke="#aaaaaa"
+//             />
+//             <YAxis
+//               dataKey="y"
+//               domain={[0, 0.5]}
+//               tick={{ fontSize: 10 }}
+//               tickCount={11}
+//               interval={0}
+//               type="number"
+//               stroke="#aaaaaa"
+//             />
+//             <Line
+//               type="monotone"
+//               dataKey="y"
+//               stroke="#ff9933"
+//               dot={false}
+//               strokeWidth={2}
+//             />
+//           </LineChart>
+//         </div>
+//       </div>
+//     );
+//   }
+// }
+
+// export default SignificanceLevel;

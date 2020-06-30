@@ -1,0 +1,427 @@
+// chart height: 370, width: 440
+// chart margin: 6 all sides
+// x-axis height: 30, y-axis width: 60
+// overall height: 412, width: 512
+
+import React, { Component } from 'react';
+import {
+  LineChart,
+  AreaChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Line,
+  Area,
+  Legend,
+  ComposedChart,
+} from 'recharts';
+import _ from 'lodash';
+import { formatData, getY } from '../../Utils';
+import { TweenMax } from "gsap";
+
+const initialGraph = formatData({ levelLow: -1.5, levelHigh: 1.5 });
+const CHART_WIDTH = 730;
+const CHART_HEIGHT = 400;
+const MARGIN = 6;
+const Y_WIDTH = 60;
+const X_HEIGHT = 30;
+
+const calculateBlocks = (blocks) => (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * blocks;
+const calcualteLeft = (x) => (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * (x + 4) + Y_WIDTH + MARGIN;
+const calculateLineHeight = (x) => getY(x, 1, 0) / 0.5 * (CHART_HEIGHT - MARGIN * 2 - X_HEIGHT);
+const convertToPx = (coordVal) => coordVal / 0.5 * (CHART_HEIGHT - MARGIN * 2 - X_HEIGHT);
+
+const animationHeight = (getY(-1, 1, 0) - getY(-2, 1, 0));
+const animationLeft = calculateBlocks(1);
+
+class TTest extends Component {
+  constructor(props) {
+    super(props);
+    this.animatedRefLeft = React.createRef();
+    this.animatedRefRight = React.createRef();
+
+    this.state = {
+      shrinkArea: false,
+      newGraph: {},
+    };
+  }
+
+  setRefLeft = element => {
+    this.animatedRefLeft = element;
+  };
+
+  setRefRight = element => {
+    this.animatedRefRight = element;
+  };
+
+  toggleData = () => {
+    console.log("new height", calculateLineHeight(-1));
+    console.log("new height calculated", calculateLineHeight(-2) + convertToPx(animationHeight));
+
+    TweenMax.to(
+      this.animatedRefLeft, 1, 
+      { 
+        x: animationLeft - 0.5,
+        height: convertToPx(animationHeight) + X_HEIGHT + MARGIN,
+      }
+    );
+    TweenMax.to(
+      this.animatedRefRight, 1, 
+      { 
+        x: -animationLeft - 0.5,
+        height: convertToPx(animationHeight) + X_HEIGHT + MARGIN,
+      }
+    );
+  }
+
+  createTestLine = (x, propRef) => (
+    <div style={{
+        position: 'absolute',
+        bottom: X_HEIGHT + MARGIN,
+        width: 2,
+        height: calculateLineHeight(x),
+        left: calcualteLeft(x) - 1,
+        backgroundColor: '#82ca9d'
+      }}
+      ref={propRef}
+    />
+  );
+
+  render() {
+    return (
+      <div id="container" style={{backgroundColor: '#fafafa', margin: 20, height: CHART_HEIGHT, width: CHART_WIDTH, position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+          <AreaChart
+            width={CHART_WIDTH}
+            height={CHART_HEIGHT}
+            data={initialGraph.data}
+            margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+          >
+            <XAxis
+              axisLine={false}
+              tickLine={false}
+              tick={false}
+              domain={[-4, 4]}
+            />
+            <YAxis
+              tick={false}
+              axisLine={false}
+              tickLine={false}
+              domain={[0, 0.5]}
+            />
+          <Area
+            type="monotone"
+            dataKey="area"
+            fill="#82ca9d"
+            stroke="#8884d8"
+            legendType="circle"
+            isAnimationActive={false}
+          />
+        </AreaChart>
+        </div>
+        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+          <LineChart
+            width={CHART_WIDTH}
+            height={CHART_HEIGHT}
+            data={initialGraph.data}
+            onClick={this.toggleData}
+            margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+          >
+            <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#e1e1e1" />
+            <XAxis
+              dataKey="x"
+              domain={[-4, 4]}
+              tick={{ fontSize: 12 }}
+              tickCount={initialGraph.ticks}
+              interval={1}
+              stroke="#aaaaaa"
+            />
+            <YAxis
+              dataKey="y"
+              domain={[0, 0.5]}
+              tick={{ fontSize: 10 }}
+              tickCount={11}
+              interval={0}
+              type="number"
+              stroke="#aaaaaa"
+            />
+            <Line
+              type="monotone"
+              dataKey="y"
+              stroke="#333333"
+              dot={false}
+              strokeWidth={1}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </div>
+        {this.createTestLine(-2, this.setRefLeft)}
+        {this.createTestLine(2, this.setRefRight)}
+
+        {/* <ComposedChart
+          width={CHART_WIDTH}
+          height={CHART_HEIGHT}
+          data={initialGraph.data}
+          margin={{ top: 6, bottom: 6, left: 6, right: 6, }}
+        >
+          <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#e1e1e1" />
+            <XAxis
+              dataKey="x"
+              domain={[-4, 4]}
+              tick={{ fontSize: 12 }}
+              tickCount={initialGraph.ticks}
+              interval={1}
+              stroke="#aaaaaa"
+            />
+            <YAxis
+              dataKey="y"
+              domain={[0, 0.5]}
+              tick={{ fontSize: 10 }}
+              tickCount={11}
+              interval={0}
+              type="number"
+              stroke="#aaaaaa"
+            />
+            <Area
+              type="monotone"
+              dataKey="area"
+              fill="#82ca9d"
+              stroke="#8884d8"
+              isAnimationActive={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="y"
+              stroke="#333333"
+              dot={false}
+              strokeWidth={1}
+              isAnimationActive={false}
+            />
+        </ComposedChart> */}
+       
+      </div>
+    );
+  }
+}
+
+export default TTest;
+
+
+// chart height: 370, width: 440
+// chart margin: 6 all sides
+// x-axis height: 30, y-axis width: 60
+// overall height: 412, width: 512
+
+import React, { Component } from 'react';
+import {
+  LineChart,
+  AreaChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Line,
+  Area,
+} from 'recharts';
+import _ from 'lodash';
+import { formatData, getY } from '../../Utils';
+
+const CHART_WIDTH = 730;
+const CHART_HEIGHT = 400;
+const MARGIN = 6;
+const Y_WIDTH = 60;
+const X_HEIGHT = 30;
+const LEVEL_LOW = -1.5;
+const LEVEL_HIGH = 1.5;
+const FAIL_COLOR = 'red';
+const PASS_COLOR = '#82ca9d';
+const ANIMATION_TIME = 1000;
+
+const initialGraph = formatData({ levelLow: LEVEL_LOW, levelHigh: LEVEL_HIGH });
+
+// calculate pixel from x-axis step
+const calculateBlocks = (blocks) => (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * blocks;
+
+// calcualte pixel for left from x coordinate
+const calcualteLeft = (x) => (CHART_WIDTH - MARGIN * 2 - Y_WIDTH) / 8 * (x + 4) + Y_WIDTH + MARGIN;
+
+// calculate pixel for height from x coordinate
+const calculateLineHeight = (x) => getY(x, 1, 0) / 0.5 * (CHART_HEIGHT - MARGIN * 2 - X_HEIGHT);
+
+// convert y coordinate to pixel
+const convertToPx = (coordVal) => coordVal / 0.5 * (CHART_HEIGHT - MARGIN * 2 - X_HEIGHT);
+
+const animationStart = {
+  leftX: calcualteLeft(-2) - 0.5,
+  rightX: calcualteLeft(2) - 0.5,
+  xCoord: -2,
+  height: calculateLineHeight(-2),
+}
+
+const animationEnd = {
+  leftX: calcualteLeft(-1) - 0.5,
+  rightX: calcualteLeft(1) - 0.5,
+  xCoord: -1,
+  height: calculateLineHeight(-1),
+}
+
+class TTest extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      moveToFail: false,
+      animation: animationStart,
+      lineColor: PASS_COLOR,
+    };
+  }
+
+  toggleData = () => {
+    var start, end;
+    const startTime = Date.now();
+    const moveToFail = !this.state.moveToFail;
+
+    if(moveToFail) {
+      start = animationStart;
+      end = animationEnd;
+    } else {
+      start = animationEnd;
+      end = animationStart;
+    }
+
+    const changeX = end.leftX - start.leftX;
+    const changeXCoord = end.xCoord - start.xCoord;
+
+    console.log("changeX", changeX);
+
+    const animate = () => {
+      const timePassed = Date.now() - startTime;
+      const x = timePassed / ANIMATION_TIME * changeX;
+      console.log("x", x);
+      console.log("curr", start.leftX + x, " end", end.leftX);
+      const xCoord = timePassed / ANIMATION_TIME * changeXCoord + start.xCoord;
+      const height = calculateLineHeight(xCoord);
+      if ((moveToFail && start.leftX + x > end.leftX) || (!moveToFail && start.leftX + x < end.leftX)) {
+        this.setState({ 
+          animation: { 
+            leftX: end.leftX,
+            rightX: end.rightX,
+            height: end.height,
+          }
+        });
+      }
+
+      if ((moveToFail && start.leftX + x <= end.leftX) || (!moveToFail && start.leftX + x >= end.leftX)) {
+        this.setState({ 
+          animation: { 
+            leftX: start.leftX + x,
+            rightX: start.rightX - x,
+            height,
+          },
+          lineColor: PASS_COLOR
+        });
+        if(xCoord > LEVEL_LOW) {
+          this.setState({
+            lineColor: FAIL_COLOR
+          });
+        }
+        requestAnimationFrame(animate);
+      }
+    }
+    animate();
+
+    this.setState({ moveToFail });
+  }
+
+  render() {
+    const { animation, lineColor } = this.state;
+
+    return (
+      <div id="container" style={{backgroundColor: '#fafafa', margin: 20, height: CHART_HEIGHT, width: CHART_WIDTH, position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+          <AreaChart
+            width={CHART_WIDTH}
+            height={CHART_HEIGHT}
+            data={initialGraph.data}
+            margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+          >
+            <XAxis
+              axisLine={false}
+              tickLine={false}
+              tick={false}
+              domain={[-4, 4]}
+            />
+            <YAxis
+              tick={false}
+              axisLine={false}
+              tickLine={false}
+              domain={[0, 0.5]}
+            />
+          <Area
+            type="monotone"
+            dataKey="area"
+            fill="#82ca9d"
+            stroke="#8884d8"
+            legendType="circle"
+            isAnimationActive={false}
+          />
+        </AreaChart>
+        </div>
+        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+          <LineChart
+            width={CHART_WIDTH}
+            height={CHART_HEIGHT}
+            data={initialGraph.data}
+            onClick={this.toggleData}
+            margin={{ top: 6, right: 6, bottom: 6, left: 6 }}
+          >
+            <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#e1e1e1" />
+            <XAxis
+              dataKey="x"
+              domain={[-4, 4]}
+              tick={{ fontSize: 12 }}
+              tickCount={initialGraph.ticks}
+              interval={1}
+              stroke="#aaaaaa"
+            />
+            <YAxis
+              dataKey="y"
+              domain={[0, 0.5]}
+              tick={{ fontSize: 10 }}
+              tickCount={11}
+              interval={0}
+              type="number"
+              stroke="#aaaaaa"
+            />
+            <Line
+              type="monotone"
+              dataKey="y"
+              stroke="#333333"
+              dot={false}
+              strokeWidth={1}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </div>
+        <div style={{
+            position: 'absolute',
+            bottom: X_HEIGHT + MARGIN,
+            width: 2,
+            height: animation.height,
+            left: animation.leftX,
+            backgroundColor: lineColor
+          }}
+        />
+        <div style={{
+            position: 'absolute',
+            bottom: X_HEIGHT + MARGIN,
+            width: 2,
+            height: animation.height,
+            left: animation.rightX,
+            backgroundColor: lineColor
+          }}
+        />
+      </div>
+    );
+  }
+}
+
+export default TTest;

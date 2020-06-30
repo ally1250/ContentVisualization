@@ -1,0 +1,84 @@
+// import React, { Component } from 'react';
+// import {
+//   LineChart,
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Tooltip,
+//   Line,
+// } from 'recharts';
+// import _ from 'lodash';
+// import { formatData } from '../../Utils';
+
+// const CustomTooltip = ({ active, payload, label }) => {
+//   if (active) {
+//     return (
+//       <div style={{ background: "white", height: 100, width: 50, borderWidth: 2 }}>
+//         <div>{payload[0].payload.x}</div>
+//         <div>{_.round(payload[0].payload.y, 4).toFixed(4)}</div>
+//       </div>
+//     );
+//   }
+
+//   return null;
+// };
+
+// const initialGraph = formatData();
+// const newGraph = formatData({ a: 2, b: 0 });
+
+// class ReChartLine extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = {
+//       updateGraph: false,
+//     };
+//   }
+
+//   toggleData = () => {
+//     console.log("clicked!!");
+//     this.setState({ updateGraph: !this.state.updateGraph });
+//   }
+
+//   render() {
+//     const graph = !this.state.updateGraph ? initialGraph : newGraph;
+//     return (
+//       <div style={{ backgroundColor: '#fafafa', margin: 20 }}>
+//         <LineChart
+//           width={730}
+//           height={400}
+//           data={graph.data}
+//           margin={{ top: 50, right: 30, left: 20, bottom: 5 }}
+//           onClick={this.toggleData}
+//         >
+//           <XAxis
+//             dataKey="x"
+//             domain={[-4, 4]}
+//             tick={{ fontSize: 12 }}
+//             tickCount={graph.ticks}
+//             interval={1}
+//           />
+//           <YAxis
+//             dataKey="y"
+//             domain={[0, 0.5]}
+//             tick={{ fontSize: 10 }}
+//             tickCount={11}
+//             interval={0}
+//             type="number"
+//           />
+//           <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#e1e1e1" />
+//           <Tooltip content={<div />}/>
+//           {/* <Tooltip content={<CustomTooltip />}/> */}
+//           <Line
+//             type="monotone"
+//             dataKey="y"
+//             stroke="#ff9933"
+//             dot={false}
+//             strokeWidth={2}
+//           />
+//         </LineChart>
+//       </div>
+//     );
+//   }
+// }
+
+// export default ReChartLine;
