@@ -4,7 +4,7 @@ This project is still under development to allow more user interactions such as 
 
 ## To run the project:
 
-### Clone or download the repository
-### Run `npm install` in the repository root
-### Run `npm start` to run the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Clone or download the repository
+- Run `npm install` in the repository root
+- Run `npm start` to run the app in the development mode.<br />
+- Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
